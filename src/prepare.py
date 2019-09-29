@@ -11,7 +11,7 @@ def clean_df(df, column_name):
     Returns:
         pd.DataFrame -- processed dataframe
     """
-    df[column_name] = df[column_name].str.replace('\n', ' ')
+    df[column_name] = df[column_name].fillna('').str.replace('\n', ' ')
     return df
 
 
