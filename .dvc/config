@@ -1,0 +1,4 @@
+['remote "s3remote"']
+url = s3://toxic.comments/data
+[core]
+remote = s3remote
