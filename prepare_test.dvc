@@ -1,0 +1,6 @@
+md5: 6501942f72c51698b0032ce6fc2b92e8
+deps:
+- md5: 6e9cb01a8cd984cb3e33a6cda286a2ab
+  path: src/prepare.py
+- md5: 210c1a02235f97633212e29896640db7
+  path: data/test.csv
