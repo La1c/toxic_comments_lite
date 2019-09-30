@@ -1,21 +1,23 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.exceptions import NotFittedError
+from sklearn.base import BaseEstimator, TransformerMixin
 import pickle
 import os
 import pandas as pd
+from utils import try_mkdir
 
-class Featurizer:
-    def __init__(self):
-        self.tfidf = TfidfVectorizer()
+class MNBFeaturizer(BaseEstimator, TransformerMixin):
+    def __init__(self, tfidf_vectorizer):
+        self.tfidf = tfidf_vectorizer
         self.mnb = MultinomialNB()
         self.is_fitted = False
+        super().__init__()
 
     def fit(self, X, y):
-        self.tfidf.fit(X)
-        self.mnb.fit(X, y)
+        self.mnb.fit(self.tfidf.transform(X), y)
         self.is_fitted = True
-
+        return self
 
     def transform(self, X):
         if not self.is_fitted:
@@ -26,22 +28,30 @@ class Featurizer:
         feature_matrix = tfidf_matrix.multiply(feature_probs)
         return feature_matrix
 
+    def fit_transform(self, X, y):
+        self.fit(X, y)
+        return self.transform(X)
+
     def save(self, path):
-        with open(os.path.join(path, 'tfidf.pkl'),'w') as f:
+        with open(os.path.join(path, 'tfidf.pkl'),'wb') as f:
             pickle.dump(self.tfidf, f, pickle.HIGHEST_PROTOCOL)
 
-        with open(os.path.join(path, 'mnb.pkl'),'w') as f:
+        with open(os.path.join(path, 'mnb.pkl'),'wb') as f:
             pickle.dump(self.mnb, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     @classmethod
     def load(cls, path):
-        instance = Featurizer()
+        tf_idf = None
+        mnb = None
 
-        with open(os.path.join(path, 'tfidf.pkl'), 'r') as f:
-            instance.tfidf = pickle.load(f)
+        with open(os.path.join(path, 'tfidf.pkl'), 'rb') as f:
+            tf_idf = pickle.load(f)
 
-        with open(os.path.join(path, 'mnb.pkl'), 'r') as f:
-            instance.mnb = pickle.load(f)
+        with open(os.path.join(path, 'mnb.pkl'), 'rb') as f:
+            mnb = pickle.load(f)
+
+        instance = MNBFeaturizer(tf_idf)
+        instance.mnb = mnb
 
         instance.is_fitted = True
 
@@ -59,20 +69,33 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.test:
-        featurizer = Featurizer.load(args.artifacts_path)
         data_df = pd.read_csv(args.input_data_path)
+        try_mkdir(args.output_data_path)
         for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
-            transformed = featurizer.transform(data_df['comments_text'], data_df[category])
-            with open(os.path.join(args.output_data_path, '{}_features_test.pkl'.format(category)), w) as f:
+            featurizer = MNBFeaturizer.load(os.path.join(args.artifacts_path, category))
+            transformed = featurizer.transform(data_df['comment_text'])
+            
+            with open(os.path.join(args.output_data_path, '{}_features_test.pkl'.format(category)), 'wb') as f:
                 pickle.dump(transformed, f)
 
     else:
+        print('Reading data from {}'.format(args.input_data_path))
         data_df = pd.read_csv(args.input_data_path)
+        tfidf = TfidfVectorizer()
+        tfidf.fit(data_df['comment_text'])
+
+        try_mkdir(args.artifacts_path)
+        try_mkdir(args.output_data_path)
+
         for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
-            featurizer = Featurizer()
-            transformed = featurizer.fit(data_df['comments_text'], data_df[category])
-            with open(os.path.join(args.output_data_path, '{}_features_test.pkl'.format(category)), w) as f:
+            featurizer = MNBFeaturizer(tfidf)
+            transformed = featurizer.fit_transform(data_df['comment_text'], data_df[category])
+            with open(os.path.join(args.output_data_path, '{}_features_train.pkl'.format(category)), 'wb') as f:
                 pickle.dump(transformed, f)
+            
+            try_mkdir(os.path.join(args.artifacts_path, category))
+            featurizer.save(os.path.join(args.artifacts_path, category))
+            
 
 
             
