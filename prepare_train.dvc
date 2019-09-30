@@ -1,6 +1,0 @@
-md5: fabb0b2dd76e4932b7eb5f059997e895
-deps:
-- md5: 6e9cb01a8cd984cb3e33a6cda286a2ab
-  path: src/prepare.py
-- md5: 791e42335500c447273a7dc85f58239e
-  path: data/train.csv

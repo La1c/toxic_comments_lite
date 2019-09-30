@@ -1,0 +1,15 @@
+md5: 5dcb317d9b300e2acb86bf55d2f83849
+cmd: python src\prepare.py data\train.csv data\test.csv
+deps:
+- md5: 791e42335500c447273a7dc85f58239e
+  path: data/train.csv
+- md5: 210c1a02235f97633212e29896640db7
+  path: data/test.csv
+- md5: d4a500ad06fa979e369b8182001c9622
+  path: src/prepare.py
+outs:
+- md5: 2980787d56dc653f87bec1e52a29b88f.dir
+  path: data/prepared
+  cache: true
+  metric: false
+  persist: false
