@@ -1,9 +1,8 @@
 
-
 if __name__ == "__main__":
     import argparse
     import os
-    from sklearn.linear_model import LogisticRegression
+    from sklearn.linear_model import LogisticRegressionCV
     import pickle
     from utils import try_mkdir
     import pandas as pd
@@ -21,7 +20,7 @@ if __name__ == "__main__":
     for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
         with open(os.path.join(args.input_features_path, '{}_features_train.pkl'.format(category)), 'rb') as f:
             features = pickle.load(f)
-        model = LogisticRegression()
+        model = LogisticRegressionCV([0.01, 0.1, 1, 10, 100], cv=5)
         model.fit(features, data_df[category])
 
         with open(os.path.join(args.artifacts_path, '{}_lr.pkl'.format(category)), 'wb') as f:

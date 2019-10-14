@@ -1,18 +1,18 @@
-md5: dc672e105351ba8ffe5bb1a6efc1bdc2
+md5: 0e876bfa86717596f3d98979188571f5
 cmd: python src\featurize.py data\prepared\train_prepared.csv data\featurized model\featurizers
   --train
 deps:
 - md5: abd11841e47189c5154b6d9b65d8c4b0
   path: data/prepared/train_prepared.csv
-- md5: f7e78b38f773269d221c59759a4affe0
+- md5: 0aff271beb5ba07d9694b1aa06b73c91
   path: src/featurize.py
 outs:
-- md5: 9be6d37554c3a099800704979981c0dc.dir
+- md5: 10f5fe156f96dca90787d47fbdb682b6.dir
   path: data/featurized
   cache: true
   metric: false
   persist: false
-- md5: 7d73961760023fa89c2f3e4ec74e6a59.dir
+- md5: 02c410f7a0dc8aab46ddde5a5449f872.dir
   path: model/featurizers
   cache: true
   metric: false
