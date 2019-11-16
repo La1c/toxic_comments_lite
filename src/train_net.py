@@ -1,50 +1,71 @@
-from flair.data import Corpus
-from flair.datasets import CSVClassificationCorpus
-from flair.embeddings import WordEmbeddings, FlairEmbeddings, DocumentRNNEmbeddings
-from flair.models import TextClassifier
-from flair.trainers import ModelTrainer
 import argparse
+from torch.utils.data.dataloader import DataLoader
+from bert_classifier import BertSentimentClassifier
+from bert_dataloader import BertDataset
+import torch.nn as nn
+import torch
+import torch.optim as optim
 import os
 
-parser = argparse.ArgumentParser()
-parser.add_argument('input_folder_path', type=str)
-parser.add_argument('output_model_path', type=str)
-args = parser.parse_args()  
+def train_net(train_filename, freeze, maxlen, batch_size, max_epochs, n_jobs, prints_every):
+    train_set = BertDataset(filename = train_filename, maxlen = maxlen)
+    data_loader = DataLoader(train_set, batch_size = batch_size, num_workers = n_jobs)
+    net = BertSentimentClassifier(freeze_bert = freeze)
+    criterion = nn.BCEWithLogitsLoss()
+    opt = optim.Adam(net.parameters(), lr = 2e-5)
+    
+    
+    for ep in range(max_epochs):
+        for it, (seq, attn_masks, labels) in enumerate(data_loader):
+            #Clear gradients
+            opt.zero_grad()  
+            #Converting these to cuda tensors
+            if torch.cuda.is_available():
+              device = torch.device("cuda") 
+              seq, attn_masks, labels = seq.to(device), attn_masks.to(device), labels.to(device)
 
-column_name_map = {1: "text", 2: "label_toxic"}#, 3: "label_severe_toxic", 4:"label_obscene", 5:"label_threat", 6:"label_insult", 7:"label_identity_hate"}
-corpus = CSVClassificationCorpus(args.input_folder_path,
-                                 column_name_map,
-                                 train_file='train_prepared.csv',
-                                 test_file='train_prepared.csv',
-                                 skip_header=True,
-                                 delimiter=',')
+            #Obtaining the logits from the model
+            #print(seq.size(), attn_masks.size(), labels)
+            logits = net(seq, attn_masks)
 
-label_dict = corpus.make_label_dictionary()
-#print(corpus.obtain_statistics())
+            #Computing loss
+            loss = criterion(logits.squeeze(-1), labels.float())
 
-word_embeddings = [WordEmbeddings('glove'),
-                   #FlairEmbeddings('news-forward'),
-                   #FlairEmbeddings('news-backward'),
-                   ]
-document_embeddings = DocumentRNNEmbeddings(word_embeddings,
-                                            hidden_size=512,
-                                            reproject_words=True,
-                                            reproject_words_dimension=256,
-                                            )
+            #Backpropagating the gradients
+            loss.backward()
 
-classifier = TextClassifier(document_embeddings,
-                            label_dictionary=label_dict,
-                            multi_label=True)
+            #Optimization step
+            opt.step()
+            #print('made step')
+            if (it + 1) % prints_every == 0:
+                #acc = (logits, labels)
+                print("Iteration {} of epoch {} complete. Loss : {} Accuracy : {}".format(it+1, ep+1, loss.item(), None))
 
-trainer = ModelTrainer(classifier, corpus)
 
-trainer.train(args.output_model_path,
-            #   learning_rate=0.1,
-            #   mini_batch_size=32,
-            #   anneal_factor=0.5,
-            #   patience=5,
-              max_epochs=1,
-              num_workers=12)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('train_filename', type=str)
+    parser.add_argument('--freeze', default=True, type=bool)
+    parser.add_argument('--maxlen', default=30, type=int)
+    parser.add_argument('--batch_size', default=32, type=int)
+    parser.add_argument('--max_epochs', default=10, type=int)
+    parser.add_argument('--n_jobs', default=0, type=int)
+    parser.add_argument('--prints_every', default=10, type=int)
+    
+    
+    args = parser.parse_args()  
+    train_net(args.train_filename,
+              args.freeze,
+              args.maxlen,
+              args.batch_size,
+              args.max_epochs,
+              args.n_jobs,
+              args.prints_every)
+
+
+
+
+
 
 
 
