@@ -10,7 +10,9 @@ import os
 def train_net(train_filename, freeze, maxlen, batch_size, max_epochs, n_jobs, prints_every):
     train_set = BertDataset(filename = train_filename, maxlen = maxlen)
     data_loader = DataLoader(train_set, batch_size = batch_size, num_workers = n_jobs)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     net = BertSentimentClassifier(freeze_bert = freeze)
+    net.to(device)
     criterion = nn.BCEWithLogitsLoss()
     opt = optim.Adam(net.parameters(), lr = 2e-5)
     
@@ -18,10 +20,7 @@ def train_net(train_filename, freeze, maxlen, batch_size, max_epochs, n_jobs, pr
     for ep in range(max_epochs):
         for it, (seq, attn_masks, labels) in enumerate(data_loader):
             opt.zero_grad()  
-            
-            if torch.cuda.is_available():
-              device = torch.device("cuda") 
-              seq, attn_masks, labels = seq.to(device), attn_masks.to(device), labels.to(device)
+            seq, attn_masks, labels = seq.to(device), attn_masks.to(device), labels.to(device)
 
             logits = net(seq, attn_masks)
 

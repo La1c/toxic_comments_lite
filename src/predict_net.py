@@ -8,8 +8,10 @@ from tqdm import tqdm
 import os
 
 def predict(model_path, test_data_path, maxlen, batch_size):
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     bert = BertSentimentClassifier()
     bert.load_state_dict(torch.load(model_path))
+    bert.to(device)
     test_dataset = BertDataset(test_data_path, maxlen, is_training=False)
     data_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers = 0)
     
@@ -19,7 +21,8 @@ def predict(model_path, test_data_path, maxlen, batch_size):
     
     with torch.no_grad():
         for seq, attn_masks, labels in tqdm(data_loader):
-            pred = pd.DataFrame(torch.sigmoid(bert(seq, attn_masks)).numpy(), columns=["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"])
+            seq, attn_masks, labels = seq.to(device), attn_masks.to(device), labels.to(device)
+            pred = pd.DataFrame(torch.sigmoid(bert(seq, attn_masks).cpu()).numpy(), columns=["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"])
             df = pd.concat([df,pred], ignore_index=True)
 
     df['id'] = test_df['id']
