@@ -3,7 +3,6 @@ import torch.nn as nn
 from transformers import BertModel
 
 class BertSentimentClassifier(nn.Module):
-    
     def __init__(self, freeze_bert = True, bert_model='bert-base-uncased', num_classes=6):
         super(BertSentimentClassifier, self).__init__()
 

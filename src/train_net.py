@@ -17,50 +17,48 @@ def train_net(train_filename, freeze, maxlen, batch_size, max_epochs, n_jobs, pr
     
     for ep in range(max_epochs):
         for it, (seq, attn_masks, labels) in enumerate(data_loader):
-            #Clear gradients
             opt.zero_grad()  
-            #Converting these to cuda tensors
+            
             if torch.cuda.is_available():
               device = torch.device("cuda") 
               seq, attn_masks, labels = seq.to(device), attn_masks.to(device), labels.to(device)
 
-            #Obtaining the logits from the model
-            #print(seq.size(), attn_masks.size(), labels)
             logits = net(seq, attn_masks)
 
-            #Computing loss
             loss = criterion(logits.squeeze(-1), labels.float())
 
-            #Backpropagating the gradients
             loss.backward()
 
-            #Optimization step
             opt.step()
-            #print('made step')
+
             if (it + 1) % prints_every == 0:
-                #acc = (logits, labels)
-                print("Iteration {} of epoch {} complete. Loss : {} Accuracy : {}".format(it+1, ep+1, loss.item(), None))
+                print("Iteration {} of epoch {} complete. Loss : {}".format(it+1, ep+1, loss.item()))
+                
+    return net
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('train_filename', type=str)
+    parser.add_argument('model_file',type=str)
     parser.add_argument('--freeze', default=True, type=bool)
     parser.add_argument('--maxlen', default=30, type=int)
-    parser.add_argument('--batch_size', default=32, type=int)
-    parser.add_argument('--max_epochs', default=10, type=int)
+    parser.add_argument('--batch_size', default=128, type=int)
+    parser.add_argument('--max_epochs', default=1, type=int)
     parser.add_argument('--n_jobs', default=0, type=int)
     parser.add_argument('--prints_every', default=10, type=int)
     
     
     args = parser.parse_args()  
-    train_net(args.train_filename,
+    net = train_net(args.train_filename,
               args.freeze,
               args.maxlen,
               args.batch_size,
               args.max_epochs,
               args.n_jobs,
               args.prints_every)
+    
+    torch.save(net.state_dict(), args.model_file)
 
 
 
