@@ -48,5 +48,5 @@ if __name__ == "__main__":
             args.maxlen,
             args.batch_size)
     
-    print(df.head())
+    try_mkdir('/'.join(args.prediction_file.split('/')[:-1]))
     df.to_csv(args.prediction_file, index=False)

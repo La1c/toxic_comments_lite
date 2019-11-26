@@ -1,0 +1,6 @@
+md5: 51d54c1a8659a05b084bac083c2ef853
+cmd: kaggle competitions submit -c jigsaw-toxic-comment-classification-challenge -f
+  data/predicted_net/bert_pred.csv -m "net submition"
+deps:
+- md5: 5a71c3f8eea8a34d85e2b3612bf8f645
+  path: data/predicted_net/bert_pred.csv

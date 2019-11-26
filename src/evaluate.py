@@ -27,5 +27,3 @@ mean_auc = np.mean(category_auc)
 with open(args.metric_file, 'w') as f:
     f.write('{:4f}\n'.format(mean_auc))
 
-    
-

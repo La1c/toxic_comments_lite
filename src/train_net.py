@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch
 import torch.optim as optim
 import os
+from utils import try_mkdir
 
 def train_net(train_filename, freeze, maxlen, batch_size, max_epochs, n_jobs, prints_every):
     train_set = BertDataset(filename = train_filename, maxlen = maxlen)
@@ -57,6 +58,7 @@ if __name__ == "__main__":
               args.n_jobs,
               args.prints_every)
     
+    try_mkdir('/'.join(args.model_file.split('/')[:-1]))
     torch.save(net.state_dict(), args.model_file)
 
 
