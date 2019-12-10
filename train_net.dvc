@@ -1,4 +1,4 @@
-md5: 00d5ac79d9f5ffe5849b2de826bb659f
+md5: 89ca9ba158ac3a4e81f641d1d2b09fef
 cmd: python src/train_net.py data/prepared/train_prepared.csv model/predictors_net/bert.net
   --max_epochs=1
 deps:
@@ -7,7 +7,7 @@ deps:
 - md5: abd11841e47189c5154b6d9b65d8c4b0
   path: data/prepared/train_prepared.csv
 outs:
-- md5: 11093b39a0e9336863e62ea3f3f772bf
+- md5: 50ec695cf184346b16ad821a20d48672
   path: model/predictors_net/bert.net
   cache: true
   metric: false

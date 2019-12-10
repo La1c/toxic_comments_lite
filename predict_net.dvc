@@ -1,4 +1,4 @@
-md5: 085b1914d5f4b9229a3219e7d51c21eb
+md5: 4305101d70384973558e984809eff8f2
 cmd: python src/predict_net.py data/prepared/test_prepared.csv model/predictors_net/bert.net
   data/predicted_net/bert_pred.csv
 deps:
@@ -6,10 +6,10 @@ deps:
   path: src/predict_net.py
 - md5: 883bf262a20e9535f9f94ec24c66855e
   path: data/prepared/test_prepared.csv
-- md5: 11093b39a0e9336863e62ea3f3f772bf
+- md5: 50ec695cf184346b16ad821a20d48672
   path: model/predictors_net/bert.net
 outs:
-- md5: cd4724cd1b9293d1f6d324b6376136e9.dir
+- md5: 36c0b265865b2a70764dd16f7f6ce1e3.dir
   path: data/predicted_net
   cache: true
   metric: false
