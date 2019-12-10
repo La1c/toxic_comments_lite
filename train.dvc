@@ -1,14 +1,14 @@
-md5: c43df247bbd9ca6223fea4b465d5b3c4
-cmd: python src\train.py data\train.csv data\featurized model\predictors
+md5: eeb7ed14014c57b269132e5d4a06dfff
+cmd: python src/train.py data/train.csv data/featurized model/predictors
 deps:
 - md5: 791e42335500c447273a7dc85f58239e
   path: data/train.csv
 - md5: 10f5fe156f96dca90787d47fbdb682b6.dir
   path: data/featurized
-- md5: 5183c356e84baa765f1f28fbd0dedacf
+- md5: d96f80538fe29046f162e27497fae5b7
   path: src/train.py
 outs:
-- md5: 16ce12655ce01545d2be470cbca08f75.dir
+- md5: 83382572bc71ddebb616c4693e7ea4d2.dir
   path: model/predictors
   cache: true
   metric: false

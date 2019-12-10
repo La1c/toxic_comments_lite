@@ -1,6 +1,6 @@
-md5: adce6f100befa513820e84c95d57686c
+md5: 2fda3245aea0e76d4fef634c297ca35d
 cmd: kaggle competitions submit -c jigsaw-toxic-comment-classification-challenge -f
-  data\predicted\test_pred.csv -m "Latest model"
+  data/predicted/test_pred.csv -m "Latest model"
 deps:
-- md5: 1f468675249235731ff36355b49b3688
+- md5: ce10d983b08caaa9f87b2fd13858cea6
   path: data/predicted/test_pred.csv
