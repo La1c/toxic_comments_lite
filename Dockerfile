@@ -9,4 +9,8 @@ RUN apt-get update \
 ADD . /toxic_comments
 WORKDIR /toxic_comments
 
+ENV MLFLOW_TRACKING_URI http://localhost:5000/
+
 RUN pip install -r requirements.txt
+
+#CMD /bin/bash

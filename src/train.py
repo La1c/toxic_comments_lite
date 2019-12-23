@@ -3,16 +3,20 @@ if __name__ == "__main__":
     import argparse
     import os
     from sklearn.linear_model import LogisticRegressionCV
-    from sklearn.metrics import roc_auc_score
+    from sklearn.metrics import roc_auc_score, make_scorer
     import pickle
     from utils import try_mkdir
     import pandas as pd
     import mlflow
+    from datetime import datetime
+    import numpy as np
+    
 
     parser = argparse.ArgumentParser()
     parser.add_argument('input_data_path', type=str)
     parser.add_argument('input_features_path', type=str)
     parser.add_argument('artifacts_path', type=str)
+    parser.add_argument('--mlflow_remote', type=str, default='http://localhost:5000/')
     args = parser.parse_args()  
     
     
@@ -25,11 +29,12 @@ if __name__ == "__main__":
         with open(os.path.join(args.input_features_path, '{}_features_train.pkl'.format(category)), 'rb') as f:
             features = pickle.load(f)
             
-        model = LogisticRegressionCV([0.01, 0.1, 1, 10, 100],
+        C_s = [0.01, 0.1, 1, 10, 100]
+        model = LogisticRegressionCV(C_s,
                                      cv=5, 
                                      n_jobs=-1,
                                      max_iter=1000,
-                                     scoring=roc_auc_score)
+                                     scoring=make_scorer(roc_auc_score))
         
         model.fit(features, data_df[category])
         
@@ -38,9 +43,12 @@ if __name__ == "__main__":
             pickle.dump(model, f)
         
         try: 
-            print(model.scores_) 
-            # with mlflow.start_run():
-            #     mlflow.log_metric
+            mlflow.set_tracking_uri(args.mlflow_remote)
+            mlflow.set_experiment('/log_reg_cv_{}_{}'.format(category, datetime.now())) 
+            with mlflow.start_run():
+                for i, c in enumerate(model.C_):
+                    mlflow.log_param('C_{}'.format(i), c)
+                    mlflow.log_metric("mean_roc_auc_C={}".format(C_s[i]), np.mean(model.scores_[1][:, i]))       
         except:
             pass
                 
