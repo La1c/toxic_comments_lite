@@ -11,16 +11,12 @@ if __name__ == "__main__":
     from datetime import datetime
     import numpy as np
     
-
     parser = argparse.ArgumentParser()
     parser.add_argument('input_data_path', type=str)
     parser.add_argument('input_features_path', type=str)
     parser.add_argument('artifacts_path', type=str)
-    parser.add_argument('--mlflow_remote', type=str, default='http://localhost:5000/')
     args = parser.parse_args()  
     
-    
-
     print('Reading data from {}'.format(args.input_data_path))
     data_df = pd.read_csv(args.input_data_path)
     try_mkdir(args.artifacts_path)
@@ -36,21 +32,27 @@ if __name__ == "__main__":
                                      max_iter=1000,
                                      scoring=make_scorer(roc_auc_score))
         
+        print("Fitting lr for category {}".format(category))
         model.fit(features, data_df[category])
         
 
         with open(os.path.join(args.artifacts_path, '{}_lr.pkl'.format(category)), 'wb') as f:
+            print("Saving predictor locally for category {}".format(category))
             pickle.dump(model, f)
         
         try: 
-            mlflow.set_tracking_uri(args.mlflow_remote)
-            mlflow.set_experiment('/log_reg_cv_{}_{}'.format(category, datetime.now())) 
+            mlflow.set_experiment('/log_reg_cv_{}_{}'.format(category, datetime.today().strftime('%Y%m%d'))) 
             with mlflow.start_run():
+                print("Sending cv parameters and scores to ML Flow")
                 for i, c in enumerate(model.C_):
                     mlflow.log_param('C_{}'.format(i), c)
-                    mlflow.log_metric("mean_roc_auc_C={}".format(C_s[i]), np.mean(model.scores_[1][:, i]))       
-        except:
-            pass
+                    mlflow.log_metric("mean_roc_auc_C_{}".format(C_s[i]), np.mean(model.scores_[1][:, i]))  
+                
+                print("Sending model artifact to ML Flow")
+                mlflow.log_artifact(os.path.join(args.artifacts_path, '{}_lr.pkl'.format(category)))     
+        except Exception as e:
+            print(e)
+            
                 
 
             
