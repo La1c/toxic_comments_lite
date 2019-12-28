@@ -1,5 +1,5 @@
 md5: 5dcb317d9b300e2acb86bf55d2f83849
-cmd: python src\prepare.py data\train.csv data\test.csv
+cmd: python src/prepare.py data/train.csv data/test.csv
 deps:
 - md5: 791e42335500c447273a7dc85f58239e
   path: data/train.csv
