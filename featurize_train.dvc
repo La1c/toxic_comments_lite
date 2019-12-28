@@ -1,5 +1,5 @@
 md5: 5d67b40390d69ab9710238cad342e410
-cmd: python src\featurize.py data\prepared\train_prepared.csv data\featurized model\featurizers
+cmd: python src/featurize.py data/prepared/train_prepared.csv data/featurized model/featurizers
   --train
 deps:
 - md5: abd11841e47189c5154b6d9b65d8c4b0

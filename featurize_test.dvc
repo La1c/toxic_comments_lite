@@ -1,6 +1,6 @@
 md5: 0f1486c84b96ede0561a2fe32b42a79b
-cmd: python src\featurize.py data\prepared\test_prepared.csv data\featurized_test
-  model\featurizers --test
+cmd: python src/featurize.py data/prepared/test_prepared.csv data/featurized_test
+  model/featurizers --test
 deps:
 - md5: 883bf262a20e9535f9f94ec24c66855e
   path: data/prepared/test_prepared.csv
