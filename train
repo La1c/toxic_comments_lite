@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Start training";
 echo "Preparing data";
 python src/prepare.py data/train.csv data/test.csv && echo "Featuarizing" &&
