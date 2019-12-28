@@ -184,7 +184,6 @@ thinc==7.1.1
 tornado==6.0.3
 tqdm==4.36.1
 traitlets==4.3.3
-transformers==2.1.1
 treelib==1.5.5
 typed-ast==1.4.0
 urllib3==1.24.3
