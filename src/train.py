@@ -41,7 +41,7 @@ if __name__ == "__main__":
             pickle.dump(model, f)
         
         try: 
-            mlflow.set_experiment('/log_reg_cv_{}_{}'.format(category, datetime.today().strftime('%Y%m%d'))) 
+            mlflow.set_experiment('/log_reg_cv_{}'.format(category)) 
             with mlflow.start_run():
                 print("Sending cv parameters and scores to ML Flow")
                 for i, c in enumerate(model.C_):

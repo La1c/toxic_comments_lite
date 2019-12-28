@@ -17,9 +17,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.test:
+        print("Generating features")
+        print("Reading data at {}".format(args.input_data_path))
         data_df = pd.read_csv(args.input_data_path)
         try_mkdir(args.output_data_path)
         for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
+            print("Working on category: {}".format(category))
             featurizer = MNBFeaturizer.load(os.path.join(args.artifacts_path, category))
             transformed = featurizer.transform(data_df['comment_text'])
             
@@ -27,10 +30,12 @@ if __name__ == "__main__":
                 pickle.dump(transformed, f)
 
     else:
+        print("Fitting featurizers")
         print('Reading data from {}'.format(args.input_data_path))
         data_df = pd.read_csv(args.input_data_path)
         bpemb_en = BPEmb(lang="en", dim=50, vs=200000)
         tfidf = TfidfVectorizer(tokenizer=bpemb_en.encode)
+        print("Fitting tfidf")
         tfidf.fit(data_df['comment_text'])
 
         try_mkdir(args.artifacts_path)
@@ -38,6 +43,7 @@ if __name__ == "__main__":
 
         for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
             featurizer = MNBFeaturizer(tfidf)
+            print("Fitting MNB for category {}".format(category))
             transformed = featurizer.fit_transform(data_df['comment_text'], data_df[category])
             with open(os.path.join(args.output_data_path, '{}_features_train.pkl'.format(category)), 'wb') as f:
                 pickle.dump(transformed, f)

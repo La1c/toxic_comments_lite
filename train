@@ -1,0 +1,5 @@
+echo "Start training";
+echo "Preparing data";
+python src/prepare.py data/train.csv data/test.csv && echo "Featuarizing" &&
+python src/featurize.py data/prepared/train_prepared.csv data/featurized model/featurizers --train && echo "Training" && \
+python src/train.py data/train.csv data/featurized model/predictors
