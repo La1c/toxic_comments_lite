@@ -10,7 +10,7 @@ ADD . /toxic_comments
 WORKDIR /toxic_comments
 
 ENV MLFLOW_TRACKING_URI http://localhost:5000/
+ENV AWS_ACCESS_KEY_ID some_acsess_key_id
+ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
 
-RUN pip install -r requirements.txt
-
-#CMD /bin/bash
+RUN pip install -r requirements_lite.txt
