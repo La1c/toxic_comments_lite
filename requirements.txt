@@ -46,7 +46,6 @@ docutils==0.15.2
 dvc==0.62.1
 entrypoints==0.3
 fabric==2.5.0
-flair==0.4.3
 Flask==1.1.1
 flufl.lock==3.2
 funcy==1.13
