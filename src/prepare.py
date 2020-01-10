@@ -30,13 +30,12 @@ class PreparationTask(luigi.Task):
     def run(self):
         df = pd.read_csv(self.input_df_file)
         print('processing {}'.format(self.input_df_file))
-        df_clean = self.lean_df(df, 'comment_text')
+        df_clean = self.clean_df(df, 'comment_text')
         
-
         print('writing {} to {}'.format(self.output_file_name, self.output_df_folder))
-        df_clean.to_csv(self.output(), index=False)
+        with self.output().open('w') as f:
+            df_clean.to_csv(f, index=False)
         
-
 if __name__ == "__main__":
     luigi.run()
 
