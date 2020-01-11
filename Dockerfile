@@ -9,7 +9,6 @@ RUN apt-get update \
   && pip3 install --upgrade pip
 
 
-
 ADD . /toxic_comments
 WORKDIR /toxic_comments
 RUN chmod +x train
