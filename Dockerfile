@@ -23,7 +23,7 @@ ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
 RUN pip install -r requirements.txt
 
 ENV PYTHONPATH="/toxic_comments/"
-ENV PYTHONPATH="$PYTHONPATH:$/toxic_comments/src"
+ENV PYTHONPATH="$PYTHONPATH:/toxic_comments/src"
 ENV LUIGI_CONFIG_PATH='/toxic_comments/luigi.cfg'
 
 
