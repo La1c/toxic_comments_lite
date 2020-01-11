@@ -30,13 +30,13 @@ class MNBFeaturizer(BaseFeaturizer):
         self.fit(X, y)
         return self.transform(X)
 
-    def save(self, path):
-        with open(os.path.join(path, 'mnb.pkl'),'wb') as f:
+    def save(self, filename):
+        with open(filename,'wb') as f:
             pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     @classmethod
-    def load(cls, path):
+    def load(cls, filename):
         instance = None
-        with open(os.path.join(path, 'mnb.pkl'), 'rb') as f:
+        with open(filename, 'rb') as f:
             instance = pickle.load(f)
         return instance

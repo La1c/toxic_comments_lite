@@ -1,38 +1,47 @@
 import pandas as pd
-import re
 from utils import try_mkdir
+import luigi
+import os
+from global_config import globalconfig
+import logging
 
-def clean_df(df, column_name):
-    """This function removes line breaks from the specified column
+logger = logging.getLogger('luigi-interface')
+
+class PreparationTask(luigi.Task):
+    input_df_file = luigi.Parameter(globalconfig().train_data_path)
+    output_df_folder = luigi.Parameter(globalconfig().preprocessed_data_folder)
     
-    Arguments:
-        df {pd.DataFrame} -- data to process
-        column_name {string} -- dataFrame column to clean
     
-    Returns:
-        pd.DataFrame -- processed dataframe
-    """
-    df[column_name] = df[column_name].fillna('').str.replace('\n', ' ')
-    return df
-
-
+    def clean_df(self, df, column_name):
+        """This function removes line breaks from the specified column
+    
+        Arguments:
+            df {pd.DataFrame} -- data to process
+            column_name {string} -- dataFrame column to clean
+    
+        Returns:
+            pd.DataFrame -- processed dataframe
+        """
+        
+        df[column_name] = df[column_name].fillna('').str.replace('\n', ' ')
+        return df
+    
+    def output(self):
+        input_file_name, extention = self.input_df_file.split(os.path.sep)[-1].split('.')
+        self.output_file_name = '.'.join([input_file_name + '_prepared', extention])
+        return luigi.LocalTarget(os.path.join(self.output_df_folder, self.output_file_name))
+    
+    def run(self):
+        df = pd.read_csv(self.input_df_file)
+        logger.info('processing {}'.format(self.input_df_file))
+        df_clean = self.clean_df(df, 'comment_text')
+        
+        logger.info('writing {} to {}'.format(self.output_file_name, self.output_df_folder))
+        with self.output().open('w') as f:
+            df_clean.to_csv(f, index=False)
+        
 if __name__ == "__main__":
-    import sys
-    import os
-
-    input_df_paths = sys.argv[1:]
-    for input_df_path in input_df_paths:
-        input_file_name, extention = input_df_path.split(os.path.sep)[-1].split('.')
-        output_file_name = '.'.join([input_file_name + '_prepared', extention])
-        output_path = os.path.join('data', 'prepared')
-
-        try_mkdir(output_path)
-
-        print('processing {}'.format(input_df_path))
-        df = pd.read_csv(input_df_path)
-        df_clean = clean_df(df, 'comment_text')
-        print('writing {} to {}'.format(output_file_name, output_path))
-        df_clean.to_csv(os.path.join(output_path, output_file_name), index=False)
+    luigi.run()
 
 
     

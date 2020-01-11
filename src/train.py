@@ -1,28 +1,42 @@
+import luigi
+import os
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.metrics import roc_auc_score, make_scorer
+import pickle
+from utils import try_mkdir
+import pandas as pd
+import mlflow
+from datetime import datetime
+import numpy as np
+from featurize import GenerateMNBFeaturesTask
+from global_config import globalconfig
+import logging
 
-if __name__ == "__main__":
-    import argparse
-    import os
-    from sklearn.linear_model import LogisticRegressionCV
-    from sklearn.metrics import roc_auc_score, make_scorer
-    import pickle
-    from utils import try_mkdir
-    import pandas as pd
-    import mlflow
-    from datetime import datetime
-    import numpy as np
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input_data_path', type=str)
-    parser.add_argument('input_features_path', type=str)
-    parser.add_argument('artifacts_path', type=str)
-    args = parser.parse_args()  
-    
-    print('Reading data from {}'.format(args.input_data_path))
-    data_df = pd.read_csv(args.input_data_path)
-    try_mkdir(args.artifacts_path)
+logger = logging.getLogger('luigi-interface')
 
-    for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
-        with open(os.path.join(args.input_features_path, '{}_features_train.pkl'.format(category)), 'rb') as f:
+class TrainLogRegTask(luigi.Task):
+    input_file_path = luigi.Parameter(default='./data/prepared/train_prepared.csv')
+    input_features_path = luigi.Parameter(globalconfig().featurized_data_folder)
+    category_name = luigi.Parameter()
+    output_artefact_path = luigi.Parameter(globalconfig().model_artefacts_folder)
+    
+    def requires(self):
+        return GenerateMNBFeaturesTask(input_file_path=self.input_file_path,
+                                       input_artefact_path=globalconfig().featurizers_artefacts_folder,
+                                       data_output_path=globalconfig().featurized_data_folder,
+                                       category_name=self.category_name)
+    
+    def output(self):
+        output_path = os.path.join(self.output_artefact_path, f'{self.category_name}_lr.pkl')
+        return luigi.LocalTarget(output_path)
+    
+    def run(self):
+        logger.info(f'Reading data from {self.input_file_path}')
+        data_df = pd.read_csv(self.input_file_path)
+        try_mkdir(self.output_artefact_path)
+        
+        with open(os.path.join(self.input_features_path, f'{self.category_name}_features.pkl'), 'rb') as f:
             features = pickle.load(f)
             
         C_s = [0.01, 0.1, 1, 10, 100]
@@ -32,26 +46,64 @@ if __name__ == "__main__":
                                      max_iter=1000,
                                      scoring=make_scorer(roc_auc_score))
         
-        print("Fitting lr for category {}".format(category))
-        model.fit(features, data_df[category])
+        logger.info(f"Fitting lr for category {self.category_name}")
+        model.fit(features, data_df[self.category_name])
         
-
-        with open(os.path.join(args.artifacts_path, '{}_lr.pkl'.format(category)), 'wb') as f:
-            print("Saving predictor locally for category {}".format(category))
+        with open(self.output().path, 'wb') as f:
+            logger.info(f"Saving predictor locally for category {self.category_name}")
             pickle.dump(model, f)
-        
+            
         try: 
-            mlflow.set_experiment('/log_reg_cv_{}'.format(category)) 
+            mlflow.set_experiment('/log_reg_cv_{}'.format(self.category_name)) 
             with mlflow.start_run():
-                print("Sending cv parameters and scores to ML Flow")
+                logger.info("Sending cv parameters and scores to ML Flow")
                 for i, c in enumerate(model.C_):
                     mlflow.log_param('C_{}'.format(i), c)
                     mlflow.log_metric("mean_roc_auc_C_{}".format(C_s[i]), np.mean(model.scores_[1][:, i]))  
                 
-                print("Sending model artifact to ML Flow")
-                mlflow.log_artifact(os.path.join(args.artifacts_path, '{}_lr.pkl'.format(category)))     
+                logger.info("Sending model artifact to ML Flow")
+                mlflow.log_artifact(self.output().path)     
         except Exception as e:
-            print(e)
+            logger.error("Something went wrong while trying to use MLFlow tracking: ", e)
+
+class TrainLogRegAllWrapperTask(luigi.WrapperTask):
+    input_file_path = luigi.Parameter(default='./data/prepared/train_prepared.csv')
+    input_features_path = luigi.Parameter(globalconfig().featurized_data_folder)
+    output_artefact_path = luigi.Parameter(globalconfig().model_artefacts_folder)
+    
+    def requires(self):
+        yield TrainLogRegTask(input_file_path=self.input_file_path,
+                              input_features_path=self.input_features_path,
+                              output_artefact_path=self.output_artefact_path,
+                              category_name='toxic')
+        
+        yield TrainLogRegTask(input_file_path=self.input_file_path,
+                              input_features_path=self.input_features_path,
+                              output_artefact_path=self.output_artefact_path,
+                              category_name='severe_toxic')
+        
+        yield TrainLogRegTask(input_file_path=self.input_file_path,
+                              input_features_path=self.input_features_path,
+                              output_artefact_path=self.output_artefact_path,
+                              category_name='obscene')
+        
+        yield TrainLogRegTask(input_file_path=self.input_file_path,
+                              input_features_path=self.input_features_path,
+                              output_artefact_path=self.output_artefact_path,
+                              category_name='threat')
+        
+        yield TrainLogRegTask(input_file_path=self.input_file_path,
+                              input_features_path=self.input_features_path,
+                              output_artefact_path=self.output_artefact_path,
+                              category_name='insult')
+        
+        yield TrainLogRegTask(input_file_path=self.input_file_path,
+                              input_features_path=self.input_features_path,
+                              output_artefact_path=self.output_artefact_path,
+                              category_name='identity_hate')
+    
+if __name__ == "__main__":
+    luigi.run()
             
                 
 
