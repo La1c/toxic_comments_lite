@@ -25,7 +25,7 @@ ENV PYTHONPATH="$PWD/"
 ENV PYTHONPATH="$PYTHONPATH:$PWD/src"
 ENV LUIGI_CONFIG_PATH='$PWD/luigi.cfg'
 
-RUN luigid --background --pidfile /luigi_files/pidfile --logdir /luigi_files/log_dir/ --state-path /luigi_files/statefile
+
 
 
 
