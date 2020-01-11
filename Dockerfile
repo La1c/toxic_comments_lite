@@ -1,4 +1,6 @@
 FROM ubuntu:latest
+
+EXPOSE 8082
       
 RUN apt-get update \
   && apt-get install -y python3-pip python3-dev git\
@@ -18,6 +20,13 @@ ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
 
 
 RUN pip install -r requirements.txt
+
+ENV PYTHONPATH="$PWD/"
+ENV PYTHONPATH="$PYTHONPATH:$PWD/src"
+ENV LUIGI_CONFIG_PATH='$PWD/luigi.cfg'
+
+RUN luigid --background --pidfile /luigi_files/pidfile --logdir /luigi_files/log_dir/ --state-path /luigi_files/statefile
+
 
 
 

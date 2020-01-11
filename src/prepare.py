@@ -2,10 +2,14 @@ import pandas as pd
 from utils import try_mkdir
 import luigi
 import os
+from global_config import globalconfig
+import logging
+
+logger = logging.getLogger('luigi-interface')
 
 class PreparationTask(luigi.Task):
-    input_df_file = luigi.Parameter(default='./data/train.csv')
-    output_df_folder = luigi.Parameter(default='./data/prepared/')
+    input_df_file = luigi.Parameter(globalconfig().train_data_path)
+    output_df_folder = luigi.Parameter(globalconfig().preprocessed_data_folder)
     
     
     def clean_df(self, df, column_name):
@@ -29,10 +33,10 @@ class PreparationTask(luigi.Task):
     
     def run(self):
         df = pd.read_csv(self.input_df_file)
-        print('processing {}'.format(self.input_df_file))
+        logger.info('processing {}'.format(self.input_df_file))
         df_clean = self.clean_df(df, 'comment_text')
         
-        print('writing {} to {}'.format(self.output_file_name, self.output_df_folder))
+        logger.info('writing {} to {}'.format(self.output_file_name, self.output_df_folder))
         with self.output().open('w') as f:
             df_clean.to_csv(f, index=False)
         

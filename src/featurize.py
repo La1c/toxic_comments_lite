@@ -8,25 +8,28 @@ from utils import try_mkdir
 from featurizers.mnb_featurizer import MNBFeaturizer
 from prepare import PreparationTask
 from global_config import globalconfig
+import logging
+
+logger = logging.getLogger('luigi-interface')
 
 class TrainTfidfTask(luigi.Task):
     input_file_path = luigi.Parameter('./data/prepared/train_prepared.csv')
-    artefact_output_path = luigi.Parameter('./model/featurizers')
+    artefact_output_path = luigi.Parameter(globalconfig().featurizers_artefacts_folder)
 
     def requires(self):
         return PreparationTask(input_df_file=globalconfig().train_data_path, 
-                               output_df_folder=os.path.join(*self.input_file_path.split('/')[:-1]))
+                               output_df_folder=globalconfig().preprocessed_data_folder)
         
     def output(self):
         output_name = os.path.join(self.artefact_output_path, 'tfidf_vecotrizer.pkl')
         return luigi.LocalTarget(output_name)
 
     def run(self):
-        print('Reading data from {}'.format(self.input_file_path))
+        logger.info('Reading data from {}'.format(self.input_file_path))
         data_df = pd.read_csv(self.input_file_path)
         bpemb_en = BPEmb(lang="en", dim=50, vs=200000)
         tfidf = TfidfVectorizer(tokenizer=bpemb_en.encode)
-        print("Fitting tfidf")
+        logger.info("Fitting tfidf")
         tfidf.fit(data_df['comment_text'])
 
         try_mkdir(self.artefact_output_path)
@@ -35,7 +38,7 @@ class TrainTfidfTask(luigi.Task):
 
 class TrainMNBTask(luigi.Task):
     input_file_path = luigi.Parameter('./data/prepared/train_prepared.csv')
-    artefact_output_path = luigi.Parameter('./model/featurizers')
+    artefact_output_path = luigi.Parameter(globalconfig().featurizers_artefacts_folder)
     category_name = luigi.Parameter()
 
     def requires(self):
@@ -54,15 +57,15 @@ class TrainMNBTask(luigi.Task):
             tfidf=pickle.load(f)
             
         featurizer = MNBFeaturizer(tfidf)
-        print("Fitting MNB for category {}".format(self.category_name))
+        logger.info("Fitting MNB for category {}".format(self.category_name))
         featurizer.fit(data_df['comment_text'], data_df[self.category_name])
         try_mkdir(self.artefact_output_path)
         featurizer.save(self.output().path)
         
 class GenerateMNBFeaturesTask(luigi.Task):
     input_file_path = luigi.Parameter('./data/prepared/train_prepared.csv')
-    input_artefact_path = luigi.Parameter('./model/featurizers')
-    data_output_path = luigi.Parameter('./data/featurized')
+    input_artefact_path = luigi.Parameter(globalconfig().featurizers_artefacts_folder)
+    data_output_path = luigi.Parameter(globalconfig().featurized_data_folder)
     category_name = luigi.Parameter()
     
     def requires(self):
@@ -77,15 +80,15 @@ class GenerateMNBFeaturesTask(luigi.Task):
         return luigi.LocalTarget(output_name)
     
     def run(self):
-        print("Generating features")
-        print("Reading data at {}".format(self.input_file_path))
+        logger.info("Generating features")
+        logger.info("Reading data at {}".format(self.input_file_path))
         data_df = pd.read_csv(self.input_file_path)
         
         featurizer_name = os.path.join(self.input_artefact_path,
                                        f'mnb_featurizer_{self.category_name}.pkl')
         
         featurizer = MNBFeaturizer.load(featurizer_name)
-        print('Transofrming data')
+        logger.info('Transofrming data')
         transformed = featurizer.transform(data_df['comment_text'])
         
         try_mkdir(self.data_output_path)
@@ -94,8 +97,9 @@ class GenerateMNBFeaturesTask(luigi.Task):
             
 class GenerateFeaturesWrapperTask(luigi.WrapperTask):
     input_file_path = luigi.Parameter('./data/prepared/train_prepared.csv')
-    input_artefact_path = luigi.Parameter('./model/featurizers')
-    data_output_path = luigi.Parameter('./data/featurized')
+    input_artefact_path = luigi.Parameter(globalconfig().featurizers_artefacts_folder)
+    data_output_path = luigi.Parameter(globalconfig().featurized_data_folder)
+    
     def requires(self):
         yield GenerateMNBFeaturesTask(input_file_path=self.input_file_path,
             input_artefact_path=self.input_artefact_path,
