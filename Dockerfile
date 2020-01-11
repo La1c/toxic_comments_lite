@@ -11,6 +11,7 @@ RUN apt-get update \
 
 
 ADD . /toxic_comments
+ADD . /luigi_files/log_dir/
 WORKDIR /toxic_comments
 RUN chmod +x train
 ENV PATH="/toxic_comments:${PATH}"
@@ -21,9 +22,9 @@ ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
 
 RUN pip install -r requirements.txt
 
-ENV PYTHONPATH="$PWD/"
-ENV PYTHONPATH="$PYTHONPATH:$PWD/src"
-ENV LUIGI_CONFIG_PATH='$PWD/luigi.cfg'
+ENV PYTHONPATH="/toxic_comments/"
+ENV PYTHONPATH="$PYTHONPATH:$/toxic_comments/src"
+ENV LUIGI_CONFIG_PATH='/toxic_comments/luigi.cfg'
 
 
 
