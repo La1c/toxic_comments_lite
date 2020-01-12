@@ -1,5 +1,7 @@
 To run training and log models with ML Flow:
 
+Create common network for model and tracking: `docker network create -d bridge toxic_net`
+
 Make sure you run an ML Flow server, e.g. [https://github.com/La1c/mlflow_image](https://github.com/La1c/mlflow_image).
 
 For example: 
