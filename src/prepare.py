@@ -38,7 +38,7 @@ class PreparationTask(luigi.Task):
         
         logger.info('writing {} to {}'.format(self.output_file_name, self.output_df_folder))
         with self.output().open('w') as f:
-            df_clean.to_csv(f, index=False)
+            df_clean.to_csv(f, index=False, encoding='utf-8')
         
 if __name__ == "__main__":
     luigi.run()
