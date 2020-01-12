@@ -15,7 +15,7 @@ ADD . /luigi_files/log_dir/
 WORKDIR /toxic_comments
 RUN chmod +x train
 ENV PATH="/toxic_comments:${PATH}"
-ENV MLFLOW_TRACKING_URI host.docker.internal:5000
+ENV MLFLOW_TRACKING_URI mlflow_container:5000
 ENV AWS_ACCESS_KEY_ID some_acsess_key_id
 ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
 
