@@ -25,7 +25,7 @@ RUN pip install -r requirements.txt
 ENV PYTHONPATH="/toxic_comments/"
 ENV PYTHONPATH="$PYTHONPATH:/toxic_comments/src"
 ENV LUIGI_CONFIG_PATH='/toxic_comments/luigi.cfg'
-ENV PYTHONIOENCODING=utf-8
+ENV LANG C.UTF-8 
 
 
 
