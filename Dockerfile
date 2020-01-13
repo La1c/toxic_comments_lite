@@ -14,7 +14,7 @@ ADD . /luigi_files/log_dir/
 WORKDIR /toxic_comments
 RUN chmod +x train
 ENV PATH="/toxic_comments:${PATH}"
-ENV MLFLOW_TRACKING_URI http://localhost:5000/
+ENV MLFLOW_TRACKING_URI mlflow_container:5000
 ENV AWS_ACCESS_KEY_ID some_acsess_key_id
 ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
 
@@ -22,8 +22,9 @@ ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
 RUN pip install -r requirements.txt
 
 ENV PYTHONPATH="/toxic_comments/"
-ENV PYTHONPATH="$PYTHONPATH:$/toxic_comments/src"
+ENV PYTHONPATH="$PYTHONPATH:/toxic_comments/src"
 ENV LUIGI_CONFIG_PATH='/toxic_comments/luigi.cfg'
+ENV LANG C.UTF-8 
 
 
 
