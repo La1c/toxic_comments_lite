@@ -9,8 +9,7 @@ RUN apt-get update \
   && pip3 install --upgrade pip
 
 
-RUN adduser --disable-password worker
-
+RUN adduser --disabled-password worker
 WORKDIR /home/worker
 
 
