@@ -18,7 +18,7 @@ ADD . /home/worker/luigi_files/log_dir/
 WORKDIR /home/worker/toxic_comments
 RUN chmod ugo+x train
 USER worker
-ENV PATH="/home/worker"
+ENV PATH="/home/worker:${PATH}"
 ENV PATH="/home/worker/.local/bin:${PATH}"
 ENV PATH="/home/worker/toxic_comments:${PATH}"
 ENV MLFLOW_TRACKING_URI http://mlflow_container:5000
