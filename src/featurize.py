@@ -35,6 +35,14 @@ class TrainTfidfTask(luigi.Task):
         try_mkdir(self.artefact_output_path)
         with open(self.output().path, 'wb') as f:
             pickle.dump(tfidf, f)
+            
+        try: 
+            mlflow.set_experiment('/tifidf') 
+            with mlflow.start_run():
+                logger.info("Sending tfidf artefact to MLFlow")
+                mlflow.log_artifact(self.output().path)     
+        except Exception as e:
+            logger.error("Something went wrong while trying to use MLFlow tracking: ", e)
 
 class TrainMNBTask(luigi.Task):
     input_file_path = luigi.Parameter('./data/prepared/train_prepared.csv')
@@ -61,6 +69,14 @@ class TrainMNBTask(luigi.Task):
         featurizer.fit(data_df['comment_text'], data_df[self.category_name])
         try_mkdir(self.artefact_output_path)
         featurizer.save(self.output().path)
+        
+        try: 
+            mlflow.set_experiment(f'/category_{self.category_name}') 
+            with mlflow.start_run():
+                logger.info("Sending MNB artefact to MLFlow")
+                mlflow.log_artifact(self.output().path)     
+        except Exception as e:
+            logger.error("Something went wrong while trying to use MLFlow tracking: ", e)
         
 class GenerateMNBFeaturesTask(luigi.Task):
     input_file_path = luigi.Parameter('./data/prepared/train_prepared.csv')

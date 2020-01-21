@@ -54,12 +54,12 @@ class TrainLogRegTask(luigi.Task):
             pickle.dump(model, f)
             
         try: 
-            mlflow.set_experiment('/log_reg_cv_{}'.format(self.category_name)) 
+            mlflow.set_experiment(f'/category_{self.category_name}') 
             with mlflow.start_run():
                 logger.info("Sending cv parameters and scores to ML Flow")
                 for i, c in enumerate(model.C_):
-                    mlflow.log_param('C_{}'.format(i), c)
-                    mlflow.log_metric("mean_roc_auc_C_{}".format(C_s[i]), np.mean(model.scores_[1][:, i]))  
+                    mlflow.log_param(f'C_{i}', c)
+                    mlflow.log_metric(f"mean_roc_auc_C_{C_s[i]}", np.mean(model.scores_[1][:, i]))  
                 
                 logger.info("Sending model artifact to ML Flow")
                 mlflow.log_artifact(self.output().path)     
