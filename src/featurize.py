@@ -9,6 +9,7 @@ from featurizers.mnb_featurizer import MNBFeaturizer
 from prepare import PreparationTask
 from global_config import globalconfig
 import logging
+import mlflow
 
 logger = logging.getLogger('luigi-interface')
 
