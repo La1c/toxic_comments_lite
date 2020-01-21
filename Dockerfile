@@ -9,8 +9,8 @@ RUN apt-get update \
   && pip3 install --upgrade pip
 
 
-RUN adduser worker
-USER worker
+RUN adduser --disable-password worker
+
 WORKDIR /home/worker
 
 
@@ -18,6 +18,7 @@ ADD . /toxic_comments
 ADD . /luigi_files/log_dir/
 WORKDIR /toxic_comments
 RUN chmod +x train
+USER worker
 ENV PATH="/home/worker/.local/bin:${PATH}"
 ENV PATH="/toxic_comments:${PATH}"
 ENV MLFLOW_TRACKING_URI http://mlflow_container:5000
