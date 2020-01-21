@@ -22,7 +22,7 @@ class TrainTfidfTask(luigi.Task):
                                output_df_folder=globalconfig().preprocessed_data_folder)
         
     def output(self):
-        output_name = os.path.join(self.artefact_output_path, 'tfidf_vecotrizer.pkl')
+        output_name = os.path.join(self.artefact_output_path, 'tfidf_vectorizer.pkl')
         return luigi.LocalTarget(output_name)
 
     def run(self):

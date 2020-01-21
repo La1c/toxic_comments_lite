@@ -9,17 +9,24 @@ RUN apt-get update \
   && pip3 install --upgrade pip
 
 
+RUN adduser -D worker
+USER worker
+WORKDIR /home/worker
+
+
 ADD . /toxic_comments
 ADD . /luigi_files/log_dir/
 WORKDIR /toxic_comments
 RUN chmod +x train
+ENV PATH="/home/worker/.local/bin:${PATH}"
 ENV PATH="/toxic_comments:${PATH}"
 ENV MLFLOW_TRACKING_URI http://mlflow_container:5000
 ENV AWS_ACCESS_KEY_ID some_acsess_key_id
 ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
+COPY --chown=worker:worker . .
 
 
-RUN pip install -r requirements.txt
+RUN pip install --user -r requirements.txt
 
 ENV PYTHONPATH="/toxic_comments/"
 ENV PYTHONPATH="$PYTHONPATH:/toxic_comments/src"
