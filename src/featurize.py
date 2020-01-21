@@ -38,7 +38,7 @@ class TrainTfidfTask(luigi.Task):
             pickle.dump(tfidf, f)
             
         try: 
-            mlflow.set_experiment('/tifidf') 
+            mlflow.set_experiment('/tfidf') 
             with mlflow.start_run():
                 logger.info("Sending tfidf artefact to MLFlow")
                 mlflow.log_artifact(self.output().path)     
@@ -72,7 +72,7 @@ class TrainMNBTask(luigi.Task):
         featurizer.save(self.output().path)
         
         try: 
-            mlflow.set_experiment(f'/category_{self.category_name}') 
+            mlflow.set_experiment(f'/mnb_category_{self.category_name}') 
             with mlflow.start_run():
                 logger.info("Sending MNB artefact to MLFlow")
                 mlflow.log_artifact(self.output().path)     

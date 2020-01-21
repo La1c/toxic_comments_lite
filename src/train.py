@@ -54,7 +54,7 @@ class TrainLogRegTask(luigi.Task):
             pickle.dump(model, f)
             
         try: 
-            mlflow.set_experiment(f'/category_{self.category_name}') 
+            mlflow.set_experiment(f'/lr_category_{self.category_name}') 
             with mlflow.start_run():
                 logger.info("Sending cv parameters and scores to ML Flow")
                 for i, c in enumerate(model.C_):
