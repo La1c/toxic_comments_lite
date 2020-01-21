@@ -9,7 +9,7 @@ RUN apt-get update \
   && pip3 install --upgrade pip
 
 
-RUN adduser -D worker
+RUN adduser worker
 USER worker
 WORKDIR /home/worker
 
