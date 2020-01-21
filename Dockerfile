@@ -17,6 +17,8 @@ ADD . /home/worker/toxic_comments
 ADD . /home/worker/luigi_files/log_dir/
 WORKDIR /home/worker/toxic_comments
 RUN chmod ugo+x train
+RUN chmod -R ugo+r /home/worker
+RUN chmod -R ugo+w /home/worker
 USER worker
 ENV PATH="/home/worker:${PATH}"
 ENV PATH="/home/worker/.local/bin:${PATH}"
