@@ -25,13 +25,22 @@ class PredictLogRegTask(luigi.Task):
         return luigi.LocalTarget(output_path)     
     
     def requires(self):
-        return [PreparationTask(input_df_file=self.input_batch_data,
-                               output_df_folder=globalconfig().preprocessed_data_folder),
-        GenerateFeaturesWrapperTask(input_file_path=PreparationTask(input_df_file=self.input_batch_data,
-                               output_df_folder=globalconfig().preprocessed_data_folder).output().path,
-                                    input_artefact_path=globalconfig().featurizers_artefacts_folder,
-                                    data_output_path=globalconfig().featurized_data_folder
-                                    )]
+        test_preparation = PreparationTask(input_df_file=self.input_batch_data,
+                               output_df_folder=globalconfig().preprocessed_data_folder)
+        
+        requirements_dict = {'prepared_test':test_preparation}
+        
+        for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
+            requirements_dict[f'generated_test_features_{category}'] = GenerateMNBFeaturesTask(input_file_path==test_preparation.output().path,
+                                                                                               input_artefact_path=globalconfig().featurizers_artefacts_folder,
+                                                                                               data_output_path=globalconfig().featurized_data_folder,
+                                                                                               category_name=category)
+        
+        requirements_dict['trained_log_reg']= TrainLogRegAllWrapperTask(input_file_path=globalconfig().prepared_train_data_path,
+                                             input_features_path=globalconfig().featurized_data_folder,
+                                             output_artefact_path = globalconfig().model_artefacts_folder)
+            
+        return requirements_dict
     
     def run(self):
         logger.info(f'Reading data from {self.input_batch_data}')
@@ -40,11 +49,7 @@ class PredictLogRegTask(luigi.Task):
         try_mkdir(self.output_prediction_path)
         
         for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
-            filename = GenerateMNBFeaturesTask(input_file_path=PreparationTask(input_df_file=self.input_batch_data,
-                                                                               output_df_folder=globalconfig().preprocessed_data_folder).output().path,
-                                               input_artefact_path=globalconfig().featurizers_artefacts_folder,
-                                               data_output_path=globalconfig().featurized_data_folder,
-                                               category_name=category).output().path
+            filename = self.input()[f'generated_test_features_{category}'].path
             with open(filename, 'rb') as f:
                 features = pickle.load(f)
              

@@ -72,35 +72,11 @@ class TrainLogRegAllWrapperTask(luigi.WrapperTask):
     output_artefact_path = luigi.Parameter(globalconfig().model_artefacts_folder)
     
     def requires(self):
-        yield TrainLogRegTask(input_file_path=self.input_file_path,
+        for category in ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']:
+            yield TrainLogRegTask(input_file_path=self.input_file_path,
                               input_features_path=self.input_features_path,
                               output_artefact_path=self.output_artefact_path,
-                              category_name='toxic')
-        
-        yield TrainLogRegTask(input_file_path=self.input_file_path,
-                              input_features_path=self.input_features_path,
-                              output_artefact_path=self.output_artefact_path,
-                              category_name='severe_toxic')
-        
-        yield TrainLogRegTask(input_file_path=self.input_file_path,
-                              input_features_path=self.input_features_path,
-                              output_artefact_path=self.output_artefact_path,
-                              category_name='obscene')
-        
-        yield TrainLogRegTask(input_file_path=self.input_file_path,
-                              input_features_path=self.input_features_path,
-                              output_artefact_path=self.output_artefact_path,
-                              category_name='threat')
-        
-        yield TrainLogRegTask(input_file_path=self.input_file_path,
-                              input_features_path=self.input_features_path,
-                              output_artefact_path=self.output_artefact_path,
-                              category_name='insult')
-        
-        yield TrainLogRegTask(input_file_path=self.input_file_path,
-                              input_features_path=self.input_features_path,
-                              output_artefact_path=self.output_artefact_path,
-                              category_name='identity_hate')
+                              category_name=category)
     
 if __name__ == "__main__":
     luigi.run()
