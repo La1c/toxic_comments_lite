@@ -14,7 +14,7 @@ import mlflow
 logger = logging.getLogger('luigi-interface')
 
 class TrainTfidfTask(luigi.Task):
-    input_file_path = luigi.Parameter('./data/prepared/train_prepared.csv')
+    input_file_path = luigi.Parameter(globalconfig().prepared_train_data_path)
     artefact_output_path = luigi.Parameter(globalconfig().featurizers_artefacts_folder)
 
     def requires(self):
@@ -42,12 +42,12 @@ class TrainTfidfTask(luigi.Task):
             with mlflow.start_run():
                 logger.info("Sending tfidf artefact to MLFlow")
                 mlflow.log_artifact(self.output().path)     
-                mlflow.log_artifacts('./bpemb_cache')
+                #mlflow.log_artifacts('./bpemb_cache')
         except Exception as e:
             logger.error("Something went wrong while trying to use MLFlow tracking: ", e)
 
 class TrainMNBTask(luigi.Task):
-    input_file_path = luigi.Parameter('./data/prepared/train_prepared.csv')
+    input_file_path = luigi.Parameter(globalconfig().prepared_train_data_path)
     artefact_output_path = luigi.Parameter(globalconfig().featurizers_artefacts_folder)
     category_name = luigi.Parameter()
 
@@ -87,13 +87,14 @@ class GenerateMNBFeaturesTask(luigi.Task):
     category_name = luigi.Parameter()
     
     def requires(self):
-        return TrainMNBTask(input_file_path=self.input_file_path,
+        return TrainMNBTask(input_file_path=globalconfig().prepared_train_data_path,
                             artefact_output_path=self.input_artefact_path,
                             category_name=self.category_name)
         
     def output(self):
+        file_name = self.input_file_path.split('/')[-1].split('.csv')[0]
         output_name = os.path.join(self.data_output_path,
-                                   f'{self.category_name}_features.pkl')
+                                   f'{file_name}_{self.category_name}_features.pkl')
         
         return luigi.LocalTarget(output_name)
     
@@ -119,37 +120,12 @@ class GenerateFeaturesWrapperTask(luigi.WrapperTask):
     data_output_path = luigi.Parameter(globalconfig().featurized_data_folder)
     
     def requires(self):
-        yield GenerateMNBFeaturesTask(input_file_path=self.input_file_path,
-            input_artefact_path=self.input_artefact_path,
-            data_output_path=self.data_output_path,
-            category_name='toxic')
-        
-        yield GenerateMNBFeaturesTask(input_file_path=self.input_file_path,
-            input_artefact_path=self.input_artefact_path,
-            data_output_path=self.data_output_path,
-            category_name='severe_toxic')
-        
-        yield GenerateMNBFeaturesTask(input_file_path=self.input_file_path,
-            input_artefact_path=self.input_artefact_path,
-            data_output_path=self.data_output_path,
-            category_name='obscene')
-        
-        yield GenerateMNBFeaturesTask(input_file_path=self.input_file_path,
-            input_artefact_path=self.input_artefact_path,
-            data_output_path=self.data_output_path,
-            category_name='threat')
-        
-        yield GenerateMNBFeaturesTask(input_file_path=self.input_file_path,
-            input_artefact_path=self.input_artefact_path,
-            data_output_path=self.data_output_path,
-            category_name='insult')
-        
-        yield GenerateMNBFeaturesTask(input_file_path=self.input_file_path,
-            input_artefact_path=self.input_artefact_path,
-            data_output_path=self.data_output_path,
-            category_name='identity_hate')
+        for category in ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']:
+            yield GenerateMNBFeaturesTask(input_file_path=self.input_file_path,
+                input_artefact_path=self.input_artefact_path,
+                data_output_path=self.data_output_path,
+                category_name=category)
     
-
 if __name__ == "__main__":
     luigi.run()
             
