@@ -7,7 +7,7 @@ import pandas as pd
 import logging
 import mlflow
 from prepare import PreparationTask
-from featurize import GenerateFeaturesWrapperTask
+from featurize import GenerateFeaturesWrapperTask, GenerateMNBFeaturesTask
 from global_config import globalconfig
 
 logger = logging.getLogger('luigi-interface')
@@ -27,7 +27,8 @@ class PredictLogRegTask(luigi.Task):
     def requires(self):
         return [PreparationTask(input_df_file=self.input_batch_data,
                                output_df_folder=globalconfig().preprocessed_data_folder),
-        GenerateFeaturesWrapperTask(input_file_path=self.input_batch_data.split('.csv')[0] + '_prepared.csv',
+        GenerateFeaturesWrapperTask(input_file_path=PreparationTask(input_df_file=self.input_batch_data,
+                               output_df_folder=globalconfig().preprocessed_data_folder).output().path,
                                     input_artefact_path=globalconfig().featurizers_artefacts_folder,
                                     data_output_path=globalconfig().featurized_data_folder
                                     )]
@@ -36,11 +37,15 @@ class PredictLogRegTask(luigi.Task):
         logger.info(f'Reading data from {self.input_batch_data}')
         data_df = pd.read_csv(self.input_batch_data)
         pred_df = data_df[['id']]
-        try_mkdir(self.output().path)
+        try_mkdir(self.output_prediction_path)
         
         for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
-            filename = self.input_batch_data.split('.csv')[0] + f'_prepared_{category}_features.pkl'
-            with open(os.path.join(globalconfig().featurized_data_folder, filename), 'rb') as f:
+            filename = GenerateMNBFeaturesTask(input_file_path=PreparationTask(input_df_file=self.input_batch_data,
+                                                                               output_df_folder=globalconfig().preprocessed_data_folder).output().path,
+                                               input_artefact_path=globalconfig().featurizers_artefacts_folder,
+                                               data_output_path=globalconfig().featurized_data_folder,
+                                               category_name=category).output().path
+            with open(filename, 'rb') as f:
                 features = pickle.load(f)
              
             with open(os.path.join(globalconfig().model_artefacts_folder, f'{category}_lr.pkl'), 'rb') as f:
