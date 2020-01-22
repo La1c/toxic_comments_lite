@@ -8,12 +8,11 @@ import logging
 import mlflow
 from prepare import PreparationTask
 from featurize import GenerateFeaturesWrapperTask, GenerateMNBFeaturesTask
+from train import TrainLogRegAllWrapperTask
+from train import TrainLogRegAllWrapperTask
 from global_config import globalconfig
 
 logger = logging.getLogger('luigi-interface')
-
-class GetArtifactsTask(luigi.Task):
-    pass
 
 class PredictLogRegTask(luigi.Task):
     input_batch_data = luigi.Parameter()
