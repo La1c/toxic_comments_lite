@@ -20,7 +20,8 @@ class PredictLogRegTask(luigi.Task):
     
     def output(self):
         output_path = os.path.join(self.output_prediction_path, 
-                                   self.input_batch_data.split('.csv')[0] + f'_prediction.csv')
+                                   self.input_batch_data.split('/')[-1].split('.csv')[0] + f'_prediction.csv')
+        
         return luigi.LocalTarget(output_path)     
     
     def requires(self):
