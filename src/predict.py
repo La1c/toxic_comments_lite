@@ -20,7 +20,8 @@ class PredictLogRegTask(luigi.Task):
     output_prediction_path = luigi.Parameter()
     
     def output(self):
-        output_path = os.path.join(self.output_prediction_path, input_batch_data.split('.csv')[0] + f'_prediction.csv')
+        output_path = os.path.join(self.output_prediction_path, 
+                                   self.input_batch_data.split('.csv')[0] + f'_prediction.csv')
         return luigi.LocalTarget(output_path)     
     
     def requires(self):
@@ -38,7 +39,7 @@ class PredictLogRegTask(luigi.Task):
         try_mkdir(self.output().path)
         
         for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
-            filename = f'{self.input_batch_data.split('.csv')[0] + '_prepared'}_{category}_features.pkl'
+            filename = self.input_batch_data.split('.csv')[0] + f'_prepared_{category}_features.pkl'
             with open(os.path.join(globalconfig().featurized_data_folder, filename), 'rb') as f:
                 features = pickle.load(f)
              
