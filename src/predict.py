@@ -26,7 +26,7 @@ class PredictLogRegTask(luigi.Task):
     def requires(self):
         return PreparationTask(input_df_file=self.input_batch_data,
                                output_df_folder=globalconfig().preprocessed_data_folder),
-               GenerateFeaturesWrapperTask(input_file_path=self.input_batch_data.split('.csv')[0] + '_prepared.csv',
+        GenerateFeaturesWrapperTask(input_file_path=self.input_batch_data.split('.csv')[0] + '_prepared.csv',
                                            input_artefact_path=globalconfig().featurizers_artefacts_folder,
                                            data_output_path=globalconfig().featurized_data_folder
                                            )
