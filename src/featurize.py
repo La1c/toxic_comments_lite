@@ -28,7 +28,7 @@ class TrainTfidfTask(luigi.Task):
     def run(self):
         logger.info('Reading data from {}'.format(self.input_file_path))
         data_df = pd.read_csv(self.input_file_path)
-        bpemb_en = BPEmb(lang="en", dim=50, vs=200000)
+        bpemb_en = BPEmb(lang="en", dim=50, vs=200000, cache_dir='./bpemb_cache')
         tfidf = TfidfVectorizer(tokenizer=bpemb_en.encode)
         logger.info("Fitting tfidf")
         tfidf.fit(data_df['comment_text'])
@@ -42,6 +42,7 @@ class TrainTfidfTask(luigi.Task):
             with mlflow.start_run():
                 logger.info("Sending tfidf artefact to MLFlow")
                 mlflow.log_artifact(self.output().path)     
+                mlflow.log_artifacts('./bpemb_cache')
         except Exception as e:
             logger.error("Something went wrong while trying to use MLFlow tracking: ", e)
 
