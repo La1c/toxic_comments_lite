@@ -31,7 +31,7 @@ class PredictLogRegTask(luigi.Task):
         requirements_dict = {'prepared_test':test_preparation}
         
         for category in ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]:
-            requirements_dict[f'generated_test_features_{category}'] = GenerateMNBFeaturesTask(input_file_path==test_preparation.output().path,
+            requirements_dict[f'generated_test_features_{category}'] = GenerateMNBFeaturesTask(input_file_path=test_preparation.output().path,
                                                                                                input_artefact_path=globalconfig().featurizers_artefacts_folder,
                                                                                                data_output_path=globalconfig().featurized_data_folder,
                                                                                                category_name=category)
