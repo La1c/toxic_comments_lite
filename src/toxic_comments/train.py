@@ -1,16 +1,15 @@
 import luigi
 import os
 from sklearn.linear_model import LogisticRegressionCV
-from sklearn.linear_model import LogisticRegressionCV
 from sklearn.metrics import roc_auc_score, make_scorer
 import pickle
-from utils import try_mkdir
+from toxic_comments.utils import try_mkdir
 import pandas as pd
 import mlflow
 from datetime import datetime
 import numpy as np
-from featurize import GenerateMNBFeaturesTask
-from global_config import globalconfig
+from toxic_comments.featurize import GenerateMNBFeaturesTask
+from toxic_comments.global_config import globalconfig
 import logging
 
 logger = logging.getLogger('luigi-interface')

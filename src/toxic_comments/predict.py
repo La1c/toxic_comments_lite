@@ -2,15 +2,14 @@ import luigi
 from sklearn.linear_model import LogisticRegression
 import os
 import pickle
-from utils import try_mkdir
+from toxic_comments.utils import try_mkdir
 import pandas as pd
 import logging
 import mlflow
-from prepare import PreparationTask
-from featurize import GenerateFeaturesWrapperTask, GenerateMNBFeaturesTask
-from train import TrainLogRegAllWrapperTask
-from train import TrainLogRegAllWrapperTask
-from global_config import globalconfig
+from toxic_comments.prepare import PreparationTask
+from toxic_comments.featurize import GenerateFeaturesWrapperTask, GenerateMNBFeaturesTask
+from toxic_comments.train import TrainLogRegAllWrapperTask
+from toxic_comments.global_config import globalconfig
 
 logger = logging.getLogger('luigi-interface')
 

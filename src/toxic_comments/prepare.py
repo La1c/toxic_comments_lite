@@ -1,8 +1,8 @@
 import pandas as pd
-from utils import try_mkdir
+from toxic_comments.utils import try_mkdir
 import luigi
 import os
-from global_config import globalconfig
+from toxic_comments.global_config import globalconfig
 import logging
 
 logger = logging.getLogger('luigi-interface')

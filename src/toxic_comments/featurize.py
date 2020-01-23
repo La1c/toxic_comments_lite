@@ -4,10 +4,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 import os
 import pickle
-from utils import try_mkdir
-from featurizers.mnb_featurizer import MNBFeaturizer
-from prepare import PreparationTask
-from global_config import globalconfig
+from toxic_comments.utils import try_mkdir
+from toxic_comments.featurizers.mnb_featurizer import MNBFeaturizer
+from toxic_comments.prepare import PreparationTask
+from toxic_comments.global_config import globalconfig
 import logging
 import mlflow
 

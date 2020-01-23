@@ -2,4 +2,4 @@
 echo "Starting scheduler";
 luigid --background --pidfile /home/worker/luigi_files/pidfile --logdir /home/worker/luigi_files/log_dir/ --state-path /home/worker/luigi_files/statefile &
 echo "Start predicting";
-luigi --module predict PredictLogRegTask
+luigi --module toxic_comments.predict PredictLogRegTask
