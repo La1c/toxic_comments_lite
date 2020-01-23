@@ -15,8 +15,8 @@ from global_config import globalconfig
 logger = logging.getLogger('luigi-interface')
 
 class PredictLogRegTask(luigi.Task):
-    input_batch_data = luigi.Parameter()
-    output_prediction_path = luigi.Parameter()
+    input_batch_data = luigi.Parameter(default=globalconfig().test_data_path)
+    output_prediction_path = luigi.Parameter(default=globalconfig().output_prediction_path)
     
     def output(self):
         output_path = os.path.join(self.output_prediction_path, 

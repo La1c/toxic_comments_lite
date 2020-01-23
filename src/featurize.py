@@ -42,7 +42,6 @@ class TrainTfidfTask(luigi.Task):
             with mlflow.start_run():
                 logger.info("Sending tfidf artefact to MLFlow")
                 mlflow.log_artifact(self.output().path)     
-                #mlflow.log_artifacts('./bpemb_cache')
         except Exception as e:
             logger.error("Something went wrong while trying to use MLFlow tracking: ", e)
 

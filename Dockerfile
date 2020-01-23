@@ -13,6 +13,7 @@ ADD . /toxic_comments
 ADD . /luigi_files/log_dir/
 WORKDIR /toxic_comments
 RUN chmod +x train
+RUN chmod +x predict
 ENV PATH="/toxic_comments:${PATH}"
 ENV MLFLOW_TRACKING_URI http://mlflow_container:5000
 ENV AWS_ACCESS_KEY_ID some_acsess_key_id
