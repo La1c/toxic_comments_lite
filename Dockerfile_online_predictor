@@ -1,0 +1,35 @@
+FROM ubuntu:latest
+
+EXPOSE 8070
+      
+RUN apt-get update \
+  && apt-get install -y python3-pip python3-dev git\
+  && cd /usr/local/bin \
+  && ln -s /usr/bin/python3 python \
+  && pip3 install --upgrade pip
+
+
+ADD . /toxic_classifier
+ADD . /luigi_files/log_dir/
+WORKDIR /toxic_classifier
+ENV PATH="/toxic_classifier:${PATH}"
+ENV MLFLOW_TRACKING_URI http://mlflow_container:5000
+ENV AWS_ACCESS_KEY_ID some_acsess_key_id
+ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
+
+ENV FLASK_APP="/toxic_classifier/src/online_predictor/app.py"
+ENV FLASK_RUN_PORT=8070
+ENV PYTHONPATH="/toxic_classifier"
+ENV PYTHONPATH="$PYTHONPATH:/toxic_classifier/src"
+ENV LUIGI_CONFIG_PATH='/toxic_classifier/luigi.cfg'
+ENV LANG C.UTF-8 
+
+RUN pip install .
+RUN python -m toxic_comments.online_predictor.prepare
+RUN flask run --host=0.0.0.0
+
+
+
+
+
+

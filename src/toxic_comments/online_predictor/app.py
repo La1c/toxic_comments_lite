@@ -12,4 +12,5 @@ def get_prediction():
     predictions = model.predict(examples)
     return jsonify(predictions=[p for p in predictions])
     
-    
+if __name__ == "__main__":
+    app.run(debug=False, host='0.0.0.0', port=8070)
