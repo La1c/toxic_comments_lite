@@ -35,7 +35,8 @@ class TrainLogRegTask(luigi.Task):
         data_df = pd.read_csv(self.input_file_path)
         try_mkdir(self.output_artefact_path)
         
-        with open(os.path.join(self.input_features_path, f'{self.category_name}_features.pkl'), 'rb') as f:
+        features_file_name = self.input_file_path.split('/')[-1].split('.csv')[0]
+        with open(os.path.join(self.input_features_path, f'{features_file_name}_{self.category_name}_features.pkl'), 'rb') as f:
             features = pickle.load(f)
             
         C_s = [0.01, 0.1, 1, 10, 100]
