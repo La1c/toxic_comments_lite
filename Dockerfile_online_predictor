@@ -21,7 +21,7 @@ ARG aws_key
 ENV AWS_ACCESS_KEY_ID=$aws_id
 ENV AWS_SECRET_ACCESS_KEY=$aws_key
 
-ENV FLASK_APP="/toxic_classifier/src/online_predictor/app.py"
+ENV FLASK_APP="/toxic_classifier/src/toxic_comments/online_predictor/app.py"
 ENV FLASK_RUN_PORT=8070
 ENV PYTHONPATH="/toxic_classifier"
 ENV PYTHONPATH="$PYTHONPATH:/toxic_classifier/src"
@@ -30,7 +30,6 @@ ENV LANG C.UTF-8
 
 RUN pip install .
 RUN python -m toxic_comments.online_predictor.prepare
-
 
 
 
