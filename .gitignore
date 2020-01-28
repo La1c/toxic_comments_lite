@@ -4,3 +4,5 @@
 mlruns/
 *bpemb_cache
 *.egg-info
+*data/
+*.csv
