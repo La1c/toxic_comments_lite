@@ -2,7 +2,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.exceptions import NotFittedError
 from sklearn.base import BaseEstimator, TransformerMixin
 import pickle
-from featurizers.base_featurizer import BaseFeaturizer
+from toxic_comments.featurizers.base_featurizer import BaseFeaturizer
 import os
 
 class MNBFeaturizer(BaseFeaturizer):

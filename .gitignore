@@ -2,3 +2,8 @@
 *.vscode
 *.ipynb_checkpoints/
 mlruns/
+*bpemb_cache
+*.egg-info
+*data/
+*.csv
+*.aws
