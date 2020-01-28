@@ -16,7 +16,8 @@ WORKDIR /toxic_classifier
 ENV PATH="/toxic_classifier:${PATH}"
 ENV MLFLOW_TRACKING_URI http://mlflow_container:5000
 
-COPY ~/.aws /.aws
+ARG home_path
+COPY $home_path/.aws /.aws
 #ARG aws_id
 #ARG aws_key
 #ENV AWS_ACCESS_KEY_ID=$aws_id
