@@ -22,7 +22,7 @@ Luigi DAG:
 Build and run container for online prediction:
 1. Build image `docker build --network toxic_net --build-arg -f Dockerfile_online_predictor -t toxic_classifier_online .`
 2. Run container `docker run -i -p 8070:8070 --network toxic_net --name online_predictor toxic_classifier_online:latest flask run --host=0.0.0.0`
-3. Now you can do POST requests with the following body:
+3. Now you can send POST requests to localhost:8070/predict with the following body:
 ```
 {
 	"examples": [
