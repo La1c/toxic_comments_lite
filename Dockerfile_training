@@ -16,8 +16,7 @@ RUN chmod +x train
 RUN chmod +x predict
 ENV PATH="/toxic_classifier:${PATH}"
 ENV MLFLOW_TRACKING_URI http://mlflow_container:5000
-ENV AWS_ACCESS_KEY_ID some_acsess_key_id
-ENV AWS_SECRET_ACCESS_KEY some_secret_access_key
+COPY .aws /.aws
 
 RUN pip install .
 
