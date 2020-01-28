@@ -16,7 +16,7 @@ WORKDIR /toxic_classifier
 ENV PATH="/toxic_classifier:${PATH}"
 ENV MLFLOW_TRACKING_URI http://mlflow_container:5000
 
-COPY .aws /.aws
+COPY .aws /root/.aws/
 ENV FLASK_APP="/toxic_classifier/src/toxic_comments/online_predictor/app.py"
 ENV FLASK_RUN_PORT=8070
 ENV PYTHONPATH="/toxic_classifier"
@@ -26,6 +26,7 @@ ENV LANG C.UTF-8
 
 RUN pip install .
 RUN python -m toxic_comments.online_predictor.prepare
+RUN rm -rf /root/.aws/
 
 
 
