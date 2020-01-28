@@ -16,3 +16,16 @@ Build and run container with training scripts:
 
 Luigi DAG:
 ![dag](dag.PNG)
+
+Build and run container for online prediction:
+1. Build image `docker build --network toxic_net --build-arg aws_id=ABC --build-arg aws_key=DEF -f Dockerfile_online_predictor -t toxic_classifier_online https://github.com/La1c/toxic_comments_lite.git#rest_service`
+2. Run container `docker run -i -p 8070:8070 --network toxic_net --name online_predictor toxic_classifier_online:latest flask run --host=0.0.0.0`
+3. Now you can do POST requests with the following body:
+```
+{
+	"examples": [
+        {"comment": "Some text"},
+		{"comment": "Another comment"}
+        ]
+}
+```
