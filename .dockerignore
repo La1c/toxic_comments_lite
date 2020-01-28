@@ -1,0 +1,6 @@
+*__pycache__/
+*.vscode
+*.ipynb_checkpoints/
+mlruns/
+*bpemb_cache
+*.egg-info

@@ -7,9 +7,12 @@ model = ToxicClassifier()
 
 @app.route('/predict', methods=['POST'])
 def get_prediction():
-    payload=request.json['examples']
-    examples = [e['comment'] for e in payload]
-    predictions = model.predict(examples)
+    try: 
+        payload=request.json['examples']
+        examples = [e['comment'] for e in payload]
+        predictions = model.predict(examples)
+    except Exception as e:
+        return jsonify(error=f"Something is wrong with input.\nExpected JSON of the following structure: {{'examples':[{{'comment': 'some text'}}]}}, got {request.json}.\nError: {e}")
     return jsonify(predictions=[p for p in predictions])
     
 if __name__ == "__main__":
