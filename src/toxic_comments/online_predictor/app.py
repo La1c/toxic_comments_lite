@@ -12,7 +12,7 @@ def get_prediction():
         examples = [e['comment'] for e in payload]
         predictions = model.predict(examples)
     except Exception as e:
-        return jsonify(error=f"Something is wrong with input. Expected JSON of the following structure: {{'examples':[{{'comment': 'some text'}}]}}, got {request.json}. Error: {e}")
+        return jsonify(error=f"Something is wrong with input. Expected JSON with the following structure: {{'examples':[{{'comment': 'some text'}}]}}, got {request.json}. Error: {e}")
     return jsonify(predictions=[p for p in predictions])
     
 if __name__ == "__main__":
