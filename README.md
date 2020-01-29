@@ -14,7 +14,7 @@ Build and run container with training scripts:
 
 1. Build: `docker build -f Dockerfile_training -t toxic_classifier .`
 2. Run the container. Make sure you mount a volume with train.csv and test.csv and pass AWS credentials, e.g.
-`docker run -d -i -p 8082:8082 --network toxic_net --name model_container -v /path/to/toxic_data/:/toxic_comments/data toxic_classifier:latest train`
+`docker run -i -p 8082:8082 --network toxic_net --name model_container -v /path/to/toxic_data/:/toxic_comments/data toxic_classifier:latest train`
 
 Luigi DAG:
 ![dag](dag.PNG)
